@@ -2,22 +2,30 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Przekierowanie do Logseq</title>
+    <title>Przekierowanie Logseq</title>
     <script>
         window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id');
-            const graph = urlParams.get('graph') || "dbBrain"; // Domyślna nazwa grafu
+            // Pobiera wszystko, co znajduje się w pasku adresu po "/"
+            // Przykład: https://jkd112.github.io/logseq-link/logseq://graph/...
+            const fullPath = window.location.href;
+            const logseqPart = fullPath.split('/logseq-link/')[1];
 
-            if (id) {
-                // Składanie linku Logseq
-                const logseqUrl = "logseq://graph/" + graph + "?block-id=" + id;
-                window.location.href = logseqUrl;
+            if (logseqPart && logseqPart.startsWith('logseq://')) {
+                // Dekoduje link (na wypadek gdyby Notion zamieniło znaki na %20 itp.)
+                const finalUrl = decodeURIComponent(logseqPart);
+                window.location.href = finalUrl;
+            } else {
+                // Obsługa starego formatu z ?id= (dla kompatybilności)
+                const urlParams = new URLSearchParams(window.location.search);
+                const id = urlParams.get('id');
+                if (id) {
+                    window.location.href = "logseq://graph/dbBrain?block-id=" + id;
+                }
             }
         };
     </script>
 </head>
 <body>
-    <p>Przekierowywanie do Logseq... Jeśli nic się nie dzieje, sprawdź czy masz zainstalowaną aplikację.</p>
+    <p>Przekierowywanie do Logseq... Jeśli nic się nie dzieje, upewnij się, że wkleiłeś poprawny link.</p>
 </body>
 </html>
