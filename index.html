@@ -4,29 +4,37 @@
     <meta charset="UTF-8">
     <title>Przekierowanie Logseq</title>
     <script>
-        window.onload = function() {
-            // Pobieramy cały adres URL z paska przeglądarki
+        function doRedirect() {
             const currentUrl = window.location.href;
-            
-            // Szukamy gdzie zaczyna się "logseq://"
             const logseqIndex = currentUrl.indexOf("logseq://");
 
             if (logseqIndex !== -1) {
-                // Wycinamy wszystko od "logseq://" do samego końca
-                let logseqLink = currentUrl.substring(logseqIndex);
+                let logseqLink = decodeURIComponent(currentUrl.substring(logseqIndex));
                 
-                // Dekodujemy znaki specjalne (np. %3A na :)
-                logseqLink = decodeURIComponent(logseqLink);
-
-                console.log("Przekierowuję do:", logseqLink);
+                // Metoda 1: Bezpośrednie przypisanie (działa w Safari/Firefox)
                 window.location.href = logseqLink;
+
+                // Metoda 2: "Rezerwowa" dla Chrome - symulacja kliknięcia
+                setTimeout(function() {
+                    const a = document.createElement('a');
+                    a.href = logseqLink;
+                    a.click();
+                }, 100); 
             } else {
-                document.body.innerHTML = "<h3>Błąd: Nie znaleziono linku Logseq w adresie.</h3><p>Upewnij się, że link wygląda tak: https://.../?logseq://...</p>";
+                document.body.innerHTML = "<h3>Błąd: Nie znaleziono linku Logseq.</h3>";
             }
-        };
+        }
+        
+        // Próbujemy uruchomić natychmiast
+        window.onload = doRedirect;
     </script>
 </head>
 <body>
-    <p>Przekierowywanie do Logseq...</p>
+    <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
+        <p>Przekierowywanie do Logseq...</p>
+        <button onclick="doRedirect()" style="padding: 10px 20px; cursor: pointer;">
+            Kliknij tutaj, jeśli Logseq się nie otwiera
+        </button>
+    </div>
 </body>
 </html>
