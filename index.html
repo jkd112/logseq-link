@@ -5,21 +5,23 @@
     <title>Przekierowanie Logseq</title>
     <script>
         window.onload = function() {
-            // Pobiera wszystko, co jest w linku po znaku zapytania "?"
-            const queryString = window.location.search.substring(1);
+            // Pobieramy cały adres URL z paska przeglądarki
+            const currentUrl = window.location.href;
             
-            // Dekoduje link (zamienia %3A na :, %2F na / itd.)
-            const decodedUrl = decodeURIComponent(queryString);
+            // Szukamy gdzie zaczyna się "logseq://"
+            const logseqIndex = currentUrl.indexOf("logseq://");
 
-            if (decodedUrl.startsWith('logseq://')) {
-                window.location.href = decodedUrl;
+            if (logseqIndex !== -1) {
+                // Wycinamy wszystko od "logseq://" do samego końca
+                let logseqLink = currentUrl.substring(logseqIndex);
+                
+                // Dekodujemy znaki specjalne (np. %3A na :)
+                logseqLink = decodeURIComponent(logseqLink);
+
+                console.log("Przekierowuję do:", logseqLink);
+                window.location.href = logseqLink;
             } else {
-                // Obsługa formatu ?id= (dla starych linków)
-                const urlParams = new URLSearchParams(window.location.search);
-                const id = urlParams.get('id');
-                if (id) {
-                    window.location.href = "logseq://graph/dbBrain?block-id=" + id;
-                }
+                document.body.innerHTML = "<h3>Błąd: Nie znaleziono linku Logseq w adresie.</h3><p>Upewnij się, że link wygląda tak: https://.../?logseq://...</p>";
             }
         };
     </script>
