@@ -5,17 +5,16 @@
     <title>Przekierowanie Logseq</title>
     <script>
         window.onload = function() {
-            // Pobiera wszystko, co znajduje się w pasku adresu po "/"
-            // Przykład: https://jkd112.github.io/logseq-link/logseq://graph/...
-            const fullPath = window.location.href;
-            const logseqPart = fullPath.split('/logseq-link/')[1];
+            // Pobiera wszystko, co jest w linku po znaku zapytania "?"
+            const queryString = window.location.search.substring(1);
+            
+            // Dekoduje link (zamienia %3A na :, %2F na / itd.)
+            const decodedUrl = decodeURIComponent(queryString);
 
-            if (logseqPart && logseqPart.startsWith('logseq://')) {
-                // Dekoduje link (na wypadek gdyby Notion zamieniło znaki na %20 itp.)
-                const finalUrl = decodeURIComponent(logseqPart);
-                window.location.href = finalUrl;
+            if (decodedUrl.startsWith('logseq://')) {
+                window.location.href = decodedUrl;
             } else {
-                // Obsługa starego formatu z ?id= (dla kompatybilności)
+                // Obsługa formatu ?id= (dla starych linków)
                 const urlParams = new URLSearchParams(window.location.search);
                 const id = urlParams.get('id');
                 if (id) {
@@ -26,6 +25,6 @@
     </script>
 </head>
 <body>
-    <p>Przekierowywanie do Logseq... Jeśli nic się nie dzieje, upewnij się, że wkleiłeś poprawny link.</p>
+    <p>Przekierowywanie do Logseq...</p>
 </body>
 </html>
