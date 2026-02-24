@@ -18,7 +18,7 @@
             if (targetLink) {
                 const shortcutName = "OtworzMaila";
                 // Wysyłamy link jako parametr "input"
-                const finalShortcutUrl = encodeURIComponent(targetLink);
+                const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(targetLink);
                 
                 window.location.replace(finalShortcutUrl);
             }
