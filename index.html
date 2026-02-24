@@ -6,37 +6,29 @@
     <script>
         window.onload = function() {
             const url = window.location.href;
-            
-            // 1. Sprawdzamy czy to link do LOGSEQ
+            let targetLink = null;
+
+            // Szukamy któregokolwiek z protokołów
             if (url.indexOf("logseq://") !== -1) {
-                const logseqLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
-                // Logseq otwieramy bezpośrednio
-                window.location.replace(logseqLink);
+                targetLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
+            } else if (url.indexOf("message://") !== -1) {
+                targetLink = decodeURIComponent(url.substring(url.indexOf("message://")));
+            }
+
+            if (targetLink) {
+                // Wysyłamy WSZYSTKO do Skrótu Apple, bo to jedyna metoda, której Chrome ufa
+                const shortcutName = "OtworzMaila"; 
+                const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(targetLink);
                 
-                // Rezerwa dla Chrome (symulacja kliknięcia)
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = logseqLink;
-                    a.click();
-                }, 300);
-            } 
-            
-            // 2. Sprawdzamy czy to link do MAILA
-            else if (url.indexOf("message://") !== -1) {
-                const mailLink = decodeURIComponent(url.substring(url.indexOf("message://")));
-                const shortcutName = "OtworzMaila";
-                // Maila wysyłamy do Skrótu Apple
-                const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(mailLink);
-                
-                window.location.replace(finalShortcutUrl);
+                window.location.href = finalShortcutUrl;
             }
         };
     </script>
 </head>
 <body>
     <div style="text-align:center; margin-top:50px; font-family:sans-serif;">
-        <p>Otwieranie aplikacji...</p>
-        <p style="font-size: 0.8em; color: #666;">(Logseq lub Apple Mail)</p>
+        <p>Uruchamianie Skrótu Apple...</p>
+        <p style="font-size: 0.8em; color: #666;">(Obsługa Logseq i Mail)</p>
     </div>
 </body>
 </html>
