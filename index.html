@@ -1,16 +1,29 @@
-<script>
-    window.onload = function() {
-        const url = window.location.href;
-        const mailIndex = url.indexOf("message://");
-
-        if (mailIndex !== -1) {
-            let mailLink = decodeURIComponent(url.substring(mailIndex));
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Przekierowanie</title>
+    <script>
+        window.onload = function() {
+            const url = window.location.href;
             
-            // Chrome blokuje message://, więc wysyłamy to do systemowego Skrótu
-            // Skrót o nazwie "OtworzMaila" otrzyma ten link jako tekst i go otworzy
-            const shortcutLink = "shortcuts://run-shortcut?name=OtworzMaila&input=" + encodeURIComponent(mailLink);
-            
-            window.location.href = shortcutLink;
-        }
-    }
-</script>
+            // Obsługa Logseq
+            if (url.indexOf("logseq://") !== -1) {
+                const logseqLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
+                window.location.href = logseqLink;
+            } 
+            // Obsługa Maila przez Skrót Apple
+            else if (url.indexOf("message://") !== -1) {
+                const mailLink = decodeURIComponent(url.substring(url.indexOf("message://")));
+                const shortcutName = "OtworzMaila"; // Musi być identyczna jak nazwa skrótu!
+                const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(mailLink);
+                
+                window.location.href = finalShortcutUrl;
+            }
+        };
+    </script>
+</head>
+<body>
+    <p style="text-align:center; margin-top:50px; font-family:sans-serif;">Przekierowywanie do aplikacji...</p>
+</body>
+</html>
