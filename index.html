@@ -2,39 +2,44 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Przekierowanie Logseq</title>
+    <title>Przekierowanie Linków</title>
     <script>
         function doRedirect() {
             const currentUrl = window.location.href;
-            const logseqIndex = currentUrl.indexOf("logseq://");
+            
+            // Szukamy początku jakiegokolwiek protokołu po znaku zapytania
+            // Szuka logseq:// lub message://
+            const protocols = ["logseq://", "message://"];
+            let targetLink = null;
 
-            if (logseqIndex !== -1) {
-                let logseqLink = decodeURIComponent(currentUrl.substring(logseqIndex));
-                
-                // Metoda 1: Bezpośrednie przypisanie (działa w Safari/Firefox)
-                window.location.href = logseqLink;
+            for (let p of protocols) {
+                if (currentUrl.indexOf(p) !== -1) {
+                    targetLink = decodeURIComponent(currentUrl.substring(currentUrl.indexOf(p)));
+                    break;
+                }
+            }
 
-                // Metoda 2: "Rezerwowa" dla Chrome - symulacja kliknięcia
+            if (targetLink) {
+                // Próba otwarcia
+                window.location.href = targetLink;
+
+                // Rezerwa dla Chrome/Brave
                 setTimeout(function() {
                     const a = document.createElement('a');
-                    a.href = logseqLink;
+                    a.href = targetLink;
                     a.click();
-                }, 100); 
+                }, 100);
             } else {
-                document.body.innerHTML = "<h3>Błąd: Nie znaleziono linku Logseq.</h3>";
+                document.body.innerHTML = "<h3>Nie znaleziono obsługiwanego linku.</h3><p>Obsługiwane: Logseq, Apple Mail (message://)</p>";
             }
         }
-        
-        // Próbujemy uruchomić natychmiast
         window.onload = doRedirect;
     </script>
 </head>
 <body>
     <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
-        <p>Przekierowywanie do Logseq...</p>
-        <button onclick="doRedirect()" style="padding: 10px 20px; cursor: pointer;">
-            Kliknij tutaj, jeśli Logseq się nie otwiera
-        </button>
+        <p>Otwieranie aplikacji...</p>
+        <button onclick="doRedirect()" style="padding: 10px 20px; cursor: pointer;">Kliknij tutaj, jeśli aplikacja się nie otwiera</button>
     </div>
 </body>
 </html>
