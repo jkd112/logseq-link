@@ -2,49 +2,37 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Przekierowanie Linków</title>
+    <title>Przekierowanie</title>
     <script>
-        function doRedirect() {
-            const currentUrl = window.location.href;
-            
-            // Szukamy logseq:// lub message://
-            const protocols = ["logseq://", "message://"];
-            let targetLink = null;
+        window.onload = function() {
+            const url = window.location.href;
+            const parts = url.split('?');
+            if (parts.length < 2) return;
 
-            for (let p of protocols) {
-                if (currentUrl.indexOf(p) !== -1) {
-                    targetLink = decodeURIComponent(currentUrl.substring(currentUrl.indexOf(p)));
-                    break;
-                }
+            // Wyciągamy wszystko po znaku zapytania
+            let target = decodeURIComponent(parts[1]);
+
+            // Naprawa znaku zapytania wewnątrz linku Logseq (jeśli występuje)
+            if (parts.length > 2) {
+                target += "?" + parts.slice(2).join('?');
             }
 
-            if (targetLink) {
-                // Próba 1: Standardowa
-                window.location.assign(targetLink);
+            if (target.startsWith('logseq://') || target.startsWith('message://')) {
+                // Metoda 1: Próba natychmiastowa
+                window.location.replace(target);
 
-                // Próba 2: Przez niewidoczną ramkę (skuteczne w Chrome dla message://)
-                setTimeout(function() {
-                    const iframe = document.createElement("iframe");
-                    iframe.style.display = "none";
-                    iframe.src = targetLink;
-                    document.body.appendChild(iframe);
-                }, 200);
-
-                // Próba 3: Symulacja kliknięcia
-                setTimeout(function() {
-                    const a = document.createElement('a');
-                    a.href = targetLink;
-                    a.click();
-                }, 400);
+                // Metoda 2: Rezerwowa po 300ms (dla Chrome)
+                setTimeout(() => {
+                    window.top.location.href = target;
+                }, 300);
             }
-        }
-        window.onload = doRedirect;
+        };
     </script>
 </head>
 <body>
-    <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
-        <p>Otwieranie aplikacji...</p>
-        <button onclick="doRedirect()" style="padding: 10px 20px; cursor: pointer;">Kliknij tutaj, jeśli Mail się nie otwiera</button>
+    <div style="text-align:center; margin-top:50px; font-family:sans-serif;">
+        <p>Przekierowywanie...</p>
+        <button onclick="location.reload()" style="padding:10px">Spróbuj ponownie</button>
     </div>
 </body>
 </html>
