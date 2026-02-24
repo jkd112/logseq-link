@@ -1,18 +1,42 @@
-<script>
-    window.onload = function() {
-        const url = window.location.href;
-        const mailIndex = url.indexOf("message://");
-
-        if (mailIndex !== -1) {
-            // Wycinamy link, ale NIE używamy decodeURIComponent na tym etapie,
-            // bo Skróty same sobie z tym poradzą lepiej.
-            const mailLink = url.substring(mailIndex);
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Przekierowanie</title>
+    <script>
+        window.onload = function() {
+            const url = window.location.href;
             
-            const shortcutName = "OtworzMaila";
-            // Budujemy URL do skrótu
-            const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(mailLink);
+            // 1. Sprawdzamy czy to link do LOGSEQ
+            if (url.indexOf("logseq://") !== -1) {
+                const logseqLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
+                // Logseq otwieramy bezpośrednio
+                window.location.replace(logseqLink);
+                
+                // Rezerwa dla Chrome (symulacja kliknięcia)
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = logseqLink;
+                    a.click();
+                }, 300);
+            } 
             
-            window.location.href = finalShortcutUrl;
-        }
-    };
-</script>
+            // 2. Sprawdzamy czy to link do MAILA
+            else if (url.indexOf("message://") !== -1) {
+                const mailLink = decodeURIComponent(url.substring(url.indexOf("message://")));
+                const shortcutName = "OtworzMaila";
+                // Maila wysyłamy do Skrótu Apple
+                const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(mailLink);
+                
+                window.location.replace(finalShortcutUrl);
+            }
+        };
+    </script>
+</head>
+<body>
+    <div style="text-align:center; margin-top:50px; font-family:sans-serif;">
+        <p>Otwieranie aplikacji...</p>
+        <p style="font-size: 0.8em; color: #666;">(Logseq lub Apple Mail)</p>
+    </div>
+</body>
+</html>
