@@ -6,27 +6,28 @@
     <script>
         window.onload = function() {
             const url = window.location.href;
-            let targetLink = null;
+            let targetLink = "";
 
-            const logseqIndex = url.indexOf("logseq://");
-            const mailIndex = url.indexOf("message://");
-
-            if (logseqIndex !== -1) {
-                targetLink = decodeURIComponent(url.substring(logseqIndex));
-            } else if (mailIndex !== -1) {
-                // Surowy link dla maila, żeby Skróty go nie odrzuciły
-                targetLink = url.substring(mailIndex);
+            if (url.includes("logseq://")) {
+                targetLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
+            } else if (url.includes("message://")) {
+                // Wycinamy surowy link i upewniamy się, że nie ma w nim śmieci
+                targetLink = url.substring(url.indexOf("message://")).split(' ')[0].split('"')[0];
             }
 
             if (targetLink) {
                 const shortcutName = "OtworzMaila";
+                // Wysyłamy link jako parametr "input"
                 const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(targetLink);
-                window.location.href = finalShortcutUrl;
+                
+                window.location.replace(finalShortcutUrl);
             }
         };
     </script>
 </head>
 <body>
-    <p style="text-align:center; margin-top:50px; font-family:sans-serif;">Uruchamianie przez Skróty Apple...</p>
+    <div style="text-align:center; margin-top:50px; font-family:sans-serif;">
+        <p>Przesyłanie do systemu macOS...</p>
+    </div>
 </body>
 </html>
