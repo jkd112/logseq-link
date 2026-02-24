@@ -7,8 +7,7 @@
         function doRedirect() {
             const currentUrl = window.location.href;
             
-            // Szukamy początku jakiegokolwiek protokołu po znaku zapytania
-            // Szuka logseq:// lub message://
+            // Szukamy logseq:// lub message://
             const protocols = ["logseq://", "message://"];
             let targetLink = null;
 
@@ -20,17 +19,23 @@
             }
 
             if (targetLink) {
-                // Próba otwarcia
-                window.location.href = targetLink;
+                // Próba 1: Standardowa
+                window.location.assign(targetLink);
 
-                // Rezerwa dla Chrome/Brave
+                // Próba 2: Przez niewidoczną ramkę (skuteczne w Chrome dla message://)
+                setTimeout(function() {
+                    const iframe = document.createElement("iframe");
+                    iframe.style.display = "none";
+                    iframe.src = targetLink;
+                    document.body.appendChild(iframe);
+                }, 200);
+
+                // Próba 3: Symulacja kliknięcia
                 setTimeout(function() {
                     const a = document.createElement('a');
                     a.href = targetLink;
                     a.click();
-                }, 100);
-            } else {
-                document.body.innerHTML = "<h3>Nie znaleziono obsługiwanego linku.</h3><p>Obsługiwane: Logseq, Apple Mail (message://)</p>";
+                }, 400);
             }
         }
         window.onload = doRedirect;
@@ -39,7 +44,7 @@
 <body>
     <div style="text-align: center; margin-top: 50px; font-family: sans-serif;">
         <p>Otwieranie aplikacji...</p>
-        <button onclick="doRedirect()" style="padding: 10px 20px; cursor: pointer;">Kliknij tutaj, jeśli aplikacja się nie otwiera</button>
+        <button onclick="doRedirect()" style="padding: 10px 20px; cursor: pointer;">Kliknij tutaj, jeśli Mail się nie otwiera</button>
     </div>
 </body>
 </html>
