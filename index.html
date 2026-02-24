@@ -5,43 +5,45 @@
     <title>Przekierowanie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f5f5f7; }
-        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-        .btn { background-color: #007AFF; color: white; border: none; padding: 15px 30px; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: transform 0.2s; }
-        .btn:hover { transform: scale(1.05); }
-        .icon { font-size: 50px; margin-bottom: 20px; }
+        body { font-family: -apple-system, system-ui, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f5f5f7; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        .btn { background-color: #007AFF; color: white; border: none; padding: 18px 36px; border-radius: 14px; font-size: 20px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
     </style>
 </head>
 <body>
-    <div class="card" id="content">
-        <div class="icon">🚀</div>
-        <p>Przekierowywanie...</p>
+    <div id="app" class="card">
+        <p>Inicjowanie...</p>
     </div>
 
     <script>
-        window.onload = function() {
-            const url = window.location.href;
-            const logseqIndex = url.indexOf("logseq://");
-            const mailIndex = url.indexOf("message://");
+        const url = window.location.href;
+        const appDiv = document.getElementById('app');
 
-            if (logseqIndex !== -1) {
-                // Logseq zazwyczaj przechodzi automatycznie
-                const link = decodeURIComponent(url.substring(logseqIndex));
-                window.location.href = link;
-            } 
-            else if (mailIndex !== -1) {
-                // Dla Maila tworzymy przycisk, który Chrome "pokocha"
-                const link = decodeURIComponent(url.substring(mailIndex));
-                document.getElementById('content').innerHTML = `
-                    <div class="icon">✉️</div>
-                    <h2 style="margin-bottom:10px">Otwórz wiadomość</h2>
-                    <p style="color:#666; margin-bottom:25px">Chrome wymaga kliknięcia, aby otworzyć Apple Mail.</p>
-                    <a href="${link}" class="btn">Uruchom Mail</a>
-                `;
-                // Próbujemy też automat, może akurat przejdzie
-                window.location.href = link;
-            }
-        };
+        // Funkcja wyciągająca link bez względu na to, co Notion dodało przed nim
+        function getTarget(protocol) {
+            const index = url.indexOf(protocol);
+            if (index !== -1) return decodeURIComponent(url.substring(index));
+            return null;
+        }
+
+        const logseqLink = getTarget("logseq://");
+        const mailLink = getTarget("message://");
+
+        if (logseqLink) {
+            appDiv.innerHTML = "Otwieranie Logseq...";
+            window.location.replace(logseqLink);
+        } 
+        else if (mailLink) {
+            // KLUCZ: Tworzymy statyczny link, który Chrome pozwoli kliknąć
+            appDiv.innerHTML = `
+                <div style="font-size: 50px; margin-bottom: 20px;">✉️</div>
+                <h2 style="margin-top:0">Wiadomość z Mail</h2>
+                <p style="color: #666; margin-bottom: 30px;">Kliknij przycisk poniżej, aby otworzyć aplikację Mail.</p>
+                <a href="${mailLink}" rel="noreferrer" class="btn">Otwórz w Apple Mail</a>
+            `;
+        } else {
+            appDiv.innerHTML = "Nie znaleziono poprawnego linku.";
+        }
     </script>
 </body>
 </html>
