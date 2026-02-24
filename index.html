@@ -1,29 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Przekierowanie</title>
-    <script>
-        window.onload = function() {
-            const url = window.location.href;
+<script>
+    window.onload = function() {
+        const url = window.location.href;
+        const mailIndex = url.indexOf("message://");
+
+        if (mailIndex !== -1) {
+            // Wycinamy link, ale NIE używamy decodeURIComponent na tym etapie,
+            // bo Skróty same sobie z tym poradzą lepiej.
+            const mailLink = url.substring(mailIndex);
             
-            // Obsługa Logseq
-            if (url.indexOf("logseq://") !== -1) {
-                const logseqLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
-                window.location.href = logseqLink;
-            } 
-            // Obsługa Maila przez Skrót Apple
-            else if (url.indexOf("message://") !== -1) {
-                const mailLink = decodeURIComponent(url.substring(url.indexOf("message://")));
-                const shortcutName = "OtworzMaila"; // Musi być identyczna jak nazwa skrótu!
-                const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(mailLink);
-                
-                window.location.href = finalShortcutUrl;
-            }
-        };
-    </script>
-</head>
-<body>
-    <p style="text-align:center; margin-top:50px; font-family:sans-serif;">Przekierowywanie do aplikacji...</p>
-</body>
-</html>
+            const shortcutName = "OtworzMaila";
+            // Budujemy URL do skrótu
+            const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(mailLink);
+            
+            window.location.href = finalShortcutUrl;
+        }
+    };
+</script>
