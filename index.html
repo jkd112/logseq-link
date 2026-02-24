@@ -8,27 +8,25 @@
             const url = window.location.href;
             let targetLink = null;
 
-            // Szukamy któregokolwiek z protokołów
-            if (url.indexOf("logseq://") !== -1) {
-                targetLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
-            } else if (url.indexOf("message://") !== -1) {
-                targetLink = decodeURIComponent(url.substring(url.indexOf("message://")));
+            const logseqIndex = url.indexOf("logseq://");
+            const mailIndex = url.indexOf("message://");
+
+            if (logseqIndex !== -1) {
+                targetLink = decodeURIComponent(url.substring(logseqIndex));
+            } else if (mailIndex !== -1) {
+                // Surowy link dla maila, żeby Skróty go nie odrzuciły
+                targetLink = url.substring(mailIndex);
             }
 
             if (targetLink) {
-                // Wysyłamy WSZYSTKO do Skrótu Apple, bo to jedyna metoda, której Chrome ufa
-                const shortcutName = "OtworzMaila"; 
+                const shortcutName = "OtworzMaila";
                 const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(targetLink);
-                
                 window.location.href = finalShortcutUrl;
             }
         };
     </script>
 </head>
 <body>
-    <div style="text-align:center; margin-top:50px; font-family:sans-serif;">
-        <p>Uruchamianie Skrótu Apple...</p>
-        <p style="font-size: 0.8em; color: #666;">(Obsługa Logseq i Mail)</p>
-    </div>
+    <p style="text-align:center; margin-top:50px; font-family:sans-serif;">Uruchamianie przez Skróty Apple...</p>
 </body>
 </html>
