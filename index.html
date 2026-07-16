@@ -11,16 +11,20 @@
             if (url.includes("logseq://")) {
                 targetLink = decodeURIComponent(url.substring(url.indexOf("logseq://")));
             } else if (url.includes("message://")) {
-                // Wycinamy surowy link i upewniamy się, że nie ma w nim śmieci
                 targetLink = url.substring(url.indexOf("message://")).split(' ')[0].split('"')[0];
             }
 
             if (targetLink) {
                 const shortcutName = "OtworzMaila";
-                // Wysyłamy link jako parametr "input"
                 const finalShortcutUrl = "shortcuts://run-shortcut?name=" + encodeURIComponent(shortcutName) + "&input=" + encodeURIComponent(targetLink);
                 
+                // Uruchamiamy skrót
                 window.location.replace(finalShortcutUrl);
+
+                // Czekamy 1.5 sekundy (żeby macOS odebrał sygnał) i zamykamy kartę
+                setTimeout(function() {
+                    window.close();
+                }, 1500);
             }
         };
     </script>
@@ -28,6 +32,7 @@
 <body>
     <div style="text-align:center; margin-top:50px; font-family:sans-serif;">
         <p>Przesyłanie do systemu macOS...</p>
+        <p style="font-size: 0.8em; color: #666;">Ta karta zamknie się automatycznie za chwilę.</p>
     </div>
 </body>
 </html>
