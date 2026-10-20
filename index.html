@@ -33,15 +33,17 @@
             // Zamykamy kartę dopiero, gdy przeglądarka straci fokus (czyli po kliknięciu
             // „Otwórz" w okienku i uruchomieniu Skrótów) — nie na sztywno po czasie,
             // bo to zamykało okienko z pytaniem, zanim zdążyłeś kliknąć.
-            let closed = false;
-            function closeLater() {
-                if (closed) return;
-                closed = true;
-                setTimeout(function () { window.close(); }, 500);
-            }
-            window.addEventListener("blur", closeLater);
+            // UWAGA: samo okienko „Otworzyć Skróty?" zabiera stronie fokus (blur),
+            // więc zamykanie przy blur zamykało też okienko. Zamykamy kartę dopiero,
+            // gdy fokus WRÓCI do strony po jego utracie (czyli po kliknięciu w okienku
+            // i powrocie do przeglądarki).
+            let leftPage = false;
+            window.addEventListener("blur", function () { leftPage = true; });
             document.addEventListener("visibilitychange", function () {
-                if (document.hidden) closeLater();
+                if (document.hidden) leftPage = true;
+            });
+            window.addEventListener("focus", function () {
+                if (leftPage) setTimeout(function () { window.close(); }, 300);
             });
 
             window.location.href = shortcutUrl;
@@ -51,7 +53,7 @@
 <body>
     <div style="text-align:center; margin-top:50px; font-family:sans-serif;">
         <p id="status">Przesyłanie do systemu macOS...</p>
-        <p style="font-size:0.8em; color:#666;">Kliknij „Otwórz” w okienku przeglądarki. Karta zamknie się sama po uruchomieniu skrótu.</p>
+        <p style="font-size:0.8em; color:#666;">Kliknij „Otwórz” w okienku przeglądarki. Karta zamknie się sama po powrocie do przeglądarki.</p>
         <p><a id="manual" href="#">Uruchom skrót ręcznie</a></p>
     </div>
 </body>
